@@ -1753,7 +1753,10 @@ resize(); loop();
 Promise.all([flyReady, assetsReady]).then(() => {
   if (guide) walkers.push(guide);
   placeWalker(0, .016, ZONES[0].look);
-  const open = () => { coverWait = false; $('tourLoad').classList.add('done'); perfFrom = clock.elapsedTime + 3; if (tour.on) started = true; else finishTour(); };
+  // Tur jalan sendiri dimatikan: "Buka Undangan" langsung membuka undangan dan tamu scroll sendiri.
+  // Untuk menyalakan tur lagi, ganti AUTO_TOUR jadi true.
+  const AUTO_TOUR = false;
+  const open = () => { coverWait = false; $('tourLoad').classList.add('done'); perfFrom = clock.elapsedTime + 3; if (tour.on && AUTO_TOUR) started = true; else { tour.on = false; finishTour(); } };
   // the tap on "Buka Undangan" is what lets the browser start the music (the page script listens to it too)
   if (tour.on) { $('tourLoad').classList.add('ready'); requestAnimationFrame(() => requestAnimationFrame(() => { coverWait = !$('tourLoad').classList.contains('done'); })); $('tourOpen').addEventListener('click', open, { once: true }); }
   else open();
