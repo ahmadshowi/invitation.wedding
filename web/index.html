@@ -179,6 +179,7 @@ button,input,textarea{font:inherit;color:inherit}
 .rn{font:italic 500 16px var(--f-display);letter-spacing:0;text-transform:none;color:var(--blush);margin-right:16px}
 .ch h2{font-size:clamp(40px,4.6vw,62px)}
 .ch .lead{color:rgba(255,247,234,.86);font-size:15.5px;max-width:36ch;text-shadow:0 1px 14px rgba(20,19,10,.4)}
+.ch .hint{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,237,210,.75);text-shadow:0 1px 10px rgba(20,19,10,.45);margin-top:-10px}
 .ch .lead.deadline{font-weight:700;color:#FFF7EA}
 .facts{margin:0;display:grid;border-top:1px solid rgba(255,237,210,.4)}
 .facts div{display:grid;grid-template-columns:92px 1fr;gap:18px;padding:15px 0;border-bottom:1px solid rgba(255,237,210,.18);align-items:baseline}
@@ -488,8 +489,8 @@ addEventListener('pageshow', () => { if (document.body.classList.contains('touri
         <h2>Dengan memohon <em>rahmat Allah</em></h2>
         <p class="lead">Kami bermaksud menyelenggarakan pernikahan putra-putri kami:</p>
         <div class="pair">
-          <div><strong>Rayana Fitriawan</strong><span>Putra dari Bapak Sumarno &amp; Ibu Suharti</span></div>
-          <div><strong>Hasna Mariah</strong><span>Putri dari Bapak H. A Abdulrahman &amp; Ibu Enung</span></div>
+          <div><strong>Nadhir</strong><span>Putra dari Bapak Sumarno &amp; Ibu Suharti</span></div>
+          <div><strong>Salma</strong><span>Putri dari Bapak H. A Abdulrahman &amp; Ibu Enung</span></div>
         </div>
       </div>
     </article>
@@ -498,6 +499,8 @@ addEventListener('pageshow', () => { if (document.body.classList.contains('touri
         <p class="kicker"><span class="rn">II</span>Galeri</p>
         <h2>Potret kami di <em>tepi kolam</em></h2>
         <p class="lead">Kebahagiaan terpancar, beriringan dengan senyum yang kami selalu rangkai.</p>
+        <div><button class="btn" type="button" id="pondView">Lihat foto satu per satu</button></div>
+        <p class="hint">atau ketuk fotonya di tepi kolam</p>
       </div>
     </article>
     <article class="ch" data-label="Potret">
@@ -558,19 +561,19 @@ addEventListener('pageshow', () => { if (document.body.classList.contains('touri
     </div>
     <div class="couple">
       <figure class="person reveal">
-        <div class="framed"><div class="portrait"><img id="avA" alt="Rayana Fitriawan"></div></div>
+        <div class="framed"><div class="portrait"><img id="avA" alt="Nadhir"></div></div>
         <figcaption>
           <span class="kicker">Mempelai pria</span>
-          <h3>Rayana Fitriawan</h3>
+          <h3>Nadhir</h3>
           <p>Putra dari<br>Bapak Sumarno &amp; Ibu Suharti</p>
         </figcaption>
       </figure>
       <div class="and" aria-hidden="true">&amp;</div>
       <figure class="person reveal">
-        <div class="framed flip"><div class="portrait"><img id="avB" alt="Hasna Mariah"></div></div>
+        <div class="framed flip"><div class="portrait"><img id="avB" alt="Salma"></div></div>
         <figcaption>
           <span class="kicker">Mempelai wanita</span>
-          <h3>Hasna Mariah</h3>
+          <h3>Salma</h3>
           <p>Putri dari<br>Bapak H. A Abdulrahman &amp; Ibu Enung</p>
         </figcaption>
       </figure>
@@ -1256,16 +1259,22 @@ const photoMats = [0, 1, 2, 3].map(i => {
     c.fillStyle = sk[2]; c.globalAlpha = .6; c.beginPath(); c.ellipse(80 + i * 60, 140, 70, 60, 0, 0, 7); c.fill(); c.globalAlpha = 1; c.filter = 'none';
     grain(c, w, h, 1 / 50, .05);
   });
-  const m = mat(0xffffff, { map: t, roughness: .55 });
+  const m = mat(0xffffff, { map: t, roughness: .55, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: 0 });
   TL.load(`assets/galeri-${i + 1}.jpg`, img => {
     // cover-fit into the 1.1 × .82 canvas, keeping the upper part (faces) of portrait shots
     const A = 1.1 / .82, I = img.image.width / img.image.height; img.colorSpace = THREE.SRGBColorSpace;
     if (I < A) { img.repeat.set(1, I / A); img.offset.set(0, (1 - I / A) * .78); } else { img.repeat.set(A / I, 1); img.offset.set((1 - A / I) / 2, 0); }
-    m.map = img; m.needsUpdate = true;
+    m.map = m.emissiveMap = img; m.needsUpdate = true;
   }, undefined, () => {});
   return m;
 });
+// EASELS: where each pond photo hangs, so the tour can visit them one by one and a tap can open them
+const EASELS = [], easelHits = [], easelGeo = new THREE.PlaneGeometry(1.1, .82);
 [[7.2, -3.3], [9.6, -3.5], [13.4, -3.5], [15.8, -3.3]].forEach(([x, z], i) => at(x, 0, z, rr(-.12, .12), () => {
+  EASELS.push({ c: wp(0, 1.36, .17), n: wd(0, .1, 1).normalize(), glow: 0 });
+  const hit = new THREE.Mesh(easelGeo); hit.matrixAutoUpdate = false; hit.userData.i = i;
+  hit.matrix.copy(F).multiply(new THREE.Matrix4().compose(V(0, 1.36, .17), new THREE.Quaternion().setFromEuler(new THREE.Euler(-.1, 0, 0)), V(1, 1, 1)));
+  hit.matrixWorld.copy(hit.matrix); easelHits.push(hit);
   put(M.woodD, CYL(6), -.42, 1.0, .08, .1, 0, .12, .025, 2.0, .025); put(M.woodD, CYL(6), .42, 1.0, .08, .1, 0, -.12, .025, 2.0, .025); put(M.woodD, CYL(6), 0, .95, -.38, -.32, 0, 0, .025, 2.0, .025);
   put(M.woodD, BOX, 0, .86, .16, 0, 0, 0, 1.1, .04, .1);
   put(M.white, BOX, 0, 1.36, .14, -.1, 0, 0, 1.24, .96, .05); put(photoMats[i], new THREE.PlaneGeometry(1.1, .82), 0, 1.36, .17, -.1);
@@ -1568,6 +1577,12 @@ function placeWalker(s, dt, faceLook) {
 /* ---------- guided walk ---------- */
 const tour = { on: !reduce, s: 0, pause: 0, next: 1, t: 0, ending: false };
 const SPEED = 3.0;
+// pond gallery spotlight: at the gallery stop the camera visits each easel photo in turn
+const SPOT = { zone: ZONES.findIndex(z => z.label.startsWith('Galeri')), lead: .5, each: 2.6, tail: .7 };
+SPOT.total = SPOT.lead + EASELS.length * SPOT.each + SPOT.tail;
+let spotOn = -1;
+const lbOpen = () => !!document.querySelector('.lightbox:not([hidden])');
+function easelView(E, pos, tgt) { pos.copy(E.c).addScaledVector(E.n, VW < VH ? 2.9 : 1.85); tgt.copy(E.c); }
 const cap = $('tourCap'), capNo = $('tourNo'), capTitle = $('tourTitle'), prog = $('tourProg'), fade = $('fade');
 let capTimer;
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -1583,12 +1598,13 @@ function endTour() {
 $('tourSkip').onclick = endTour;
 const followPos = V(), followTgt = V(), zp = V(), zt = V();
 function tourStep(dt) {
+  if (lbOpen()) { frameCamera(0, 0, dt, 4); return; } // a guest is looking at an enlarged photo: hold the walk
   tour.t += dt;
   if (stage.dataset.mode !== 'tour') stage.dataset.mode = 'tour';
   if (tour.pause > 0) { tour.pause -= dt; if (tour.pause <= 0 && tour.next >= ZONES.length) endTour(); }
   else {
     tour.s = Math.min(routeLen, tour.s + SPEED * dt);
-    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : 1.2; showCap(tour.next); tour.next++; }
+    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : tour.next === SPOT.zone ? SPOT.total : 1.2; showCap(tour.next); tour.next++; }
   }
   const k = tour.next - 1, near = tour.pause > 0 ? ZONES[k] : null;
   const p = placeWalker(tour.s, dt, near && near.look) || route.getPointAt(tour.s / routeLen);
@@ -1599,6 +1615,15 @@ function tourStep(dt) {
   let w = 0, zk = 0;
   for (let i = 1; i < ZONES.length; i++) { const d = Math.abs(tour.s - stopS[i]); const wi = 1 - smooth(1.5, 7, d); if (wi > w) { w = wi; zk = i; } }
   if (w > 0) { const k = fly ? .55 : .8; zp.set(...ZONES[zk].cam); zt.set(...ZONES[zk].tgt); followPos.lerp(zp, w * k); followTgt.lerp(zt, w * k); }
+  // gallery stop: close-up on one photo at a time, with a caption counting them
+  let spot = -1;
+  if (tour.pause > 0 && k === SPOT.zone) { const el = SPOT.total - tour.pause - SPOT.lead; if (el >= 0) spot = Math.floor(el / SPOT.each); if (spot >= EASELS.length) spot = -1; }
+  if (spot >= 0) easelView(EASELS[spot], followPos, followTgt);
+  if (spot !== spotOn) {
+    if (spot >= 0) { capNo.textContent = ROMAN[SPOT.zone]; capTitle.textContent = `Foto ${spot + 1} dari ${EASELS.length}`; cap.classList.remove('hide'); clearTimeout(capTimer); }
+    else if (spotOn >= 0) capTimer = setTimeout(() => cap.classList.add('hide'), 600);
+    spotOn = spot;
+  }
   const a = 1 - Math.exp(-dt * (tour.t < 3 ? 1.6 : fly ? 3.2 : 2.4));
   camPos.lerp(followPos, a); camTgt.lerp(followTgt, 1 - Math.exp(-dt * (fly ? 6 : 3)));
   prog.style.width = (tour.s / routeLen * 100).toFixed(1) + '%';
@@ -1625,6 +1650,18 @@ function scrollStep(dt) {
   if (idx !== lastIdx) { railEls.forEach((r, k) => r.classList.toggle('on', k === idx)); lastIdx = idx; }
 }
 
+/* ---------- tap a pond photo to enlarge it ---------- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let hoverEasel = -1;
+function easelAt(e) {
+  const r = stage.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera); const h = ray.intersectObjects(easelHits, false)[0];
+  return h && h.distance < 30 ? h.object.userData.i : -1;
+}
+stage.addEventListener('click', e => { const i = easelAt(e); if (i >= 0 && window.openGallery) window.openGallery(i + 1); });
+if (matchMedia('(hover:hover)').matches) stage.addEventListener('pointermove', e => { hoverEasel = easelAt(e); stage.style.cursor = hoverEasel >= 0 ? 'zoom-in' : ''; });
+stage.addEventListener('pointerleave', () => { hoverEasel = -1; stage.style.cursor = ''; });
+
 /* ---------- loop ---------- */
 let visible = true;
 new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(stage);
@@ -1647,6 +1684,7 @@ function loop() {
   const t = clock.elapsedTime;
   windU.value = reduce ? 0 : t;
   if (started && tour.on) tourStep(dt); else scrollStep(dt);
+  EASELS.forEach((E, i) => { const g = i === spotOn || i === hoverEasel ? .32 : 0; E.glow += (g - E.glow) * (1 - Math.exp(-dt * 5)); photoMats[i].emissiveIntensity = E.glow; });
   if (coupleCut) coupleCut.rotation.y = Math.atan2(camera.position.x - coupleCut.position.x, camera.position.z - coupleCut.position.z);
   if (!reduce) {
     mixers.forEach(m => m.update(dt));
@@ -1713,6 +1751,9 @@ function openLB(i){ lbI=(i+GALLERY.length)%GALLERY.length;
     lb.addEventListener('click',e=>{ const a=e.target.dataset.act; if(e.target===lb||a==='x') lb.hidden=true; else if(a==='n') openLB(lbI+1); else if(a==='p') openLB(lbI-1); }); }
   lb.innerHTML=`<figure><img alt="" src="${GALLERY[lbI]}"><figcaption><span>${lbI+1} / ${GALLERY.length}</span><span class="row"><button class="btn small" data-act="p" type="button">‹</button><button class="btn small" data-act="n" type="button">›</button><button class="btn small" data-act="x" type="button">Tutup</button></span></figcaption></figure>`;
   lb.hidden=false; lb.querySelector('[data-act="x"]').focus(); }
+// the pond easels (3D) and the Galeri card open the same lightbox; n is the photo number (galeri-n.jpg)
+window.openGallery=n=>openLB(Math.max(0,GALLERY_ORDER.indexOf(n)));
+$('#pondView').addEventListener('click',()=>openGallery(1));
 gal.addEventListener('click',e=>{ const b=e.target.closest('button[data-i]'); if(b) openLB(+b.dataset.i); });
 // zoom-out reveal per photo, staggered across a row; waits for the photo itself so it never zooms over an empty frame
 if(!reduce && 'IntersectionObserver' in window){
