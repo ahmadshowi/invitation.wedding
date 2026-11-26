@@ -25,6 +25,19 @@ function copyRuntimeFiles(env) {
   };
 }
 
+// The link-preview tags (og:url, og:image) need the site's full address. Use VITE_SITE_URL when set,
+// otherwise the production domain Vercel exposes during its build, so a new domain needs no code change.
+function siteUrl(env) {
+  return {
+    name: 'site-url',
+    transformIndexHtml(html) {
+      const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+      const url = (env.VITE_SITE_URL || (host ? `https://${host}` : 'http://localhost:4173')).replace(/\/$/, '');
+      return html.replaceAll('__SITE_URL__', url);
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, import.meta.dirname, 'VITE_');
   return {
@@ -39,6 +52,6 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1500, // three.js is large on purpose
       rollupOptions: { input: { main: resolve(root, 'index.html'), tamu: resolve(root, 'tamu.html'), rekap: resolve(root, 'rekap.html') } },
     },
-    plugins: [copyRuntimeFiles(env)],
+    plugins: [copyRuntimeFiles(env), siteUrl(env)],
   };
 });
