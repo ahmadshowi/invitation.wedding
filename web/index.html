@@ -1635,7 +1635,7 @@ function tourStep(dt) {
   if (tour.pause > 0) { tour.pause -= dt; if (tour.pause <= 0 && tour.next >= ZONES.length) endTour(); }
   else {
     tour.s = Math.min(routeLen, tour.s + SPEED * dt);
-    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : 1.2; // zoom out otomatis di kolam (dimatikan): tour.next === SPOT.zone ? (VW < VH ? SPOT.holdPhone : SPOT.hold) : 1.2 showCap(tour.next); tour.next++; }
+    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : 1.2; /* zoom out otomatis di kolam (dimatikan): tour.next === SPOT.zone ? (VW < VH ? SPOT.holdPhone : SPOT.hold) : 1.2 */ showCap(tour.next); tour.next++; }
   }
   const k = tour.next - 1, near = tour.pause > 0 ? ZONES[k] : null;
   const p = placeWalker(tour.s, dt, near && near.look) || route.getPointAt(tour.s / routeLen);
