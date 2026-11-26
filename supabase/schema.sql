@@ -1,5 +1,5 @@
 -- =========================================================
---  Undangan Rayana & Hasna — skema database Supabase
+--  Undangan Salma & Nadhir — skema database Supabase
 --  Jalankan di: Supabase Dashboard → SQL Editor → New query → tempel semua → Run
 --  Aman dijalankan ulang (data yang sudah ada tidak terhapus).
 -- =========================================================

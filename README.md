@@ -1,4 +1,4 @@
-# Undangan Pernikahan Rayana & Hasna
+# Undangan Pernikahan Salma & Nadhir
 
 Website undangan dengan taman 3D realistis (Three.js): tamu diajak berjalan menyusuri taman bersama sebuah karakter, lalu kartu undangan muncul satu per satu saat halaman digulir. RSVP & ucapan tersimpan di **Supabase**, dan link personal untuk tiap tamu.
 
@@ -74,7 +74,7 @@ Taruh file dengan nama berikut di `web/assets/`. Halaman memakainya otomatis; se
 
 Foto sebaiknya dikompres dulu sebelum ditaruh (misalnya lewat squoosh.app, JPEG kualitas ±80, lebar maks. 1300 px). Hasilnya hampir tidak terlihat bedanya, tapi ukurannya bisa separuh, sehingga undangan lebih cepat terbuka di HP.
 
-Teks (nama mempelai & orang tua, alamat, rekening, tanggal) bisa diedit langsung di `index.html`. Nama di papan gerbang, buku tamu, dan neon photo booth juga ada di sana: cari "Rayana" lalu ganti semuanya.
+Teks (nama mempelai & orang tua, alamat, rekening, tanggal) bisa diedit langsung di `index.html`. Nama di papan gerbang, buku tamu, dan neon photo booth juga ada di sana: cari "Salma" lalu ganti semuanya.
 
 ## 5. Melihat RSVP & moderasi ucapan
 Supabase → **Table Editor → rsvp**. Bisa diekspor ke CSV. Rekap cepat lewat SQL Editor (termasuk yang disembunyikan):
