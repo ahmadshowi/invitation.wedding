@@ -1635,7 +1635,7 @@ function tourStep(dt) {
   if (tour.pause > 0) { tour.pause -= dt; if (tour.pause <= 0 && tour.next >= ZONES.length) endTour(); }
   else {
     tour.s = Math.min(routeLen, tour.s + SPEED * dt);
-    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : tour.next === SPOT.zone ? (VW < VH ? SPOT.holdPhone : SPOT.hold) : 1.2; showCap(tour.next); tour.next++; }
+    if (tour.next < ZONES.length && tour.s >= stopS[tour.next]) { tour.s = stopS[tour.next]; tour.pause = tour.next === ZONES.length - 1 ? 2.0 : 1.2; // zoom out otomatis di kolam (dimatikan): tour.next === SPOT.zone ? (VW < VH ? SPOT.holdPhone : SPOT.hold) : 1.2 showCap(tour.next); tour.next++; }
   }
   const k = tour.next - 1, near = tour.pause > 0 ? ZONES[k] : null;
   const p = placeWalker(tour.s, dt, near && near.look) || route.getPointAt(tour.s / routeLen);
@@ -1646,9 +1646,11 @@ function tourStep(dt) {
   let w = 0, zk = 0;
   for (let i = 1; i < ZONES.length; i++) { const d = Math.abs(tour.s - stopS[i]); const wi = 1 - smooth(1.5, 7, d); if (wi > w) { w = wi; zk = i; } }
   if (w > 0) { const k = fly ? .55 : .8; zp.set(...ZONES[zk].cam); zt.set(...ZONES[zk].tgt); followPos.lerp(zp, w * k); followTgt.lerp(zt, w * k); }
-  const atPond = tour.pause > 0 && k === SPOT.zone;
-  if (atPond) galleryView(followPos, followTgt); // all four pond photos in one frame
-  pondWall.classList.toggle('on', atPond && VW < VH);
+  // Zoom out otomatis di kolam (dimatikan, disimpan kalau mau dipakai lagi): kamera mundur supaya 4 foto kelihatan
+  // sekaligus, dan di HP keempat foto muncul sebagai susunan 2x2. Untuk menyalakan: hapus // di 3 baris ini dan di jeda tour.pause di atas.
+  // const atPond = tour.pause > 0 && k === SPOT.zone;
+  // if (atPond) galleryView(followPos, followTgt);
+  // pondWall.classList.toggle('on', atPond && VW < VH);
   /* Sorotan satu per satu (dimatikan, disimpan kalau mau dipakai lagi): kamera mendekat ke tiap foto bergantian.
      Butuh SPOT = { ..., lead: .5, each: 2.6, tail: .7 }, SPOT.total = lead + 4 * each + tail, `let spotOn = -1`,
      jeda di kolam = SPOT.total, dan easelView(E, pos, tgt) { pos.copy(E.c).addScaledVector(E.n, VW < VH ? 2.9 : 1.85); tgt.copy(E.c); }
